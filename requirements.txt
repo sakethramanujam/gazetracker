@@ -1,0 +1,5 @@
+numpy
+opencv-python
+win32api
+matplotlib
+seaborn

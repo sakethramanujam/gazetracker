@@ -1,5 +1,5 @@
 numpy
 opencv-python
-win32api
+pywin32
 matplotlib
 seaborn

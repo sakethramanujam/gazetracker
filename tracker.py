@@ -18,7 +18,7 @@ capture = cv2.VideoCapture(0)
 x = list()
 y = list()
 
-while 1:
+while not key_pressed == ESCAPE_KEY:
     success, image = capture.read()
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     #faces = face_cascade.detectMultiScale(gray, 1.3, 5)
@@ -64,7 +64,7 @@ while 1:
                 )
 
                 # print(i[0],i[1])
-                
+
                 x_pos = int((ex + ew) / 2)
                 y_pos = int((ey + eh) / 2)
                 autopy.mouse.move(x_pos, y_pos)
@@ -73,8 +73,6 @@ while 1:
 
     cv2.imshow('img', image)
     key_pressed = cv2.waitKey(30) & 0xff
-    if key_pressed == ESCAPE_KEY:
-        break
 
 
 capture.release()

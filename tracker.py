@@ -24,13 +24,13 @@ while 1:
     #faces = face_cascade.detectMultiScale(gray, 1.3, 5)
     eyes = eye_cascade.detectMultiScale(gray)
 
-   for (ex, ey, ew, eh) in eyes:
+    for (ex, ey, ew, eh) in eyes:
         cv2.rectangle(
-            img, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2
+            image, (ex, ey), (ex + ew, ey + eh), (0, 255, 0), 2
         )
         roi_gray2 = gray[ey:ey+eh, ex:ex+ew]
         roi_color2 = image[ey:ey + eh, ex:ex + ew]
-       circles = cv2.HoughCircles(
+        circles = cv2.HoughCircles(
             roi_gray2,
             cv2.HOUGH_GRADIENT,
             1,

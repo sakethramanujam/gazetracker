@@ -55,66 +55,68 @@ eye_cascade = cv2.CascadeClassifier(
     'haarcascades/haarcascade_righteye_2splits.xml'
 )
 
-#number signifies camera
-video_capture = cv2.VideoCapture(0)
-eye_x_positions = list()
-eye_y_positions = list()
+def run_tracker():
+    #number signifies camera
+    video_capture = cv2.VideoCapture(0)
+    eye_x_positions = list()
+    eye_y_positions = list()
 
-while 1:
-    success, image = video_capture.read()
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    #faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-    eyes = eye_cascade.detectMultiScale(gray)
+    key_pressed = None
 
-    for (eye_x, eye_y, eye_width, eye_height) in eyes:
-        # Standards: may be good to explicitly call out the parameters being passed to methods,
-        # if you are not explicitly declaring these values as variables with informative names
-        cv2.rectangle(
-            img=image,
-            pt1=(eye_x, eye_y),
-            pt2=(eye_x + eye_width, eye_y + eye_height),
-            color=GREEN,
-            thickness=2
-        )
-        roi_gray2 = gray[eye_y: eye_y + eye_height, eye_x: eye_x + eye_width]
-        roi_color2 = image[eye_y: eye_y + eye_height, eye_x: eye_x + eye_width]
-        # Standards: As above, it may be good to describe the parameters being passed
-        # but in this case I had a hard time reconciling the positional arguments here with expected parameters
-        hough_circles = cv2.HoughCircles(
-            roi_gray2,
-            cv2.HOUGH_GRADIENT,
-            1,
-            200,
-            param1=200,
-            param2=1,
-            minRadius=0,
-            maxRadius=0
-        )
-        # Standards: DRY (don't repeat yourself), calculate eye positions once and use them below
-        eye_x_pos = (eye_x + eye_width) / 2
-        eye_y_pos = (eye_y + eye_height) / 2
-        print(eye_x_pos, eye_y_pos)
-        eye_x_positions.append(eye_x_pos)
-        eye_y_positions.append(eye_y_pos)
+    while not key_pressed == ESCAPE_KEY:
+        success, image = video_capture.read()
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        #faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+        eyes = eye_cascade.detectMultiScale(gray)
 
-        # Standards: in general in the interests of improving readability, move logical chunks
-        # of code out into their own classes, methods, or functions to make it easier to understand overall
-        # program flow
-        update_mouse_position(hough_circles, eye_x_pos, eye_y_pos, roi_color2)
+        for (eye_x, eye_y, eye_width, eye_height) in eyes:
+            # Standards: may be good to explicitly call out the parameters being passed to methods,
+            # if you are not explicitly declaring these values as variables with informative names
+            cv2.rectangle(
+                img=image,
+                pt1=(eye_x, eye_y),
+                pt2=(eye_x + eye_width, eye_y + eye_height),
+                color=GREEN,
+                thickness=2
+            )
+            roi_gray2 = gray[eye_y: eye_y + eye_height, eye_x: eye_x + eye_width]
+            roi_color2 = image[eye_y: eye_y + eye_height, eye_x: eye_x + eye_width]
+            # Standards: As above, it may be good to describe the parameters being passed
+            # but in this case I had a hard time reconciling the positional arguments here with expected parameters
+            hough_circles = cv2.HoughCircles(
+                roi_gray2,
+                cv2.HOUGH_GRADIENT,
+                1,
+                200,
+                param1=200,
+                param2=1,
+                minRadius=0,
+                maxRadius=0
+            )
+            # Standards: DRY (don't repeat yourself), calculate eye positions once and use them below
+            eye_x_pos = (eye_x + eye_width) / 2
+            eye_y_pos = (eye_y + eye_height) / 2
+            print(eye_x_pos, eye_y_pos)
+            eye_x_positions.append(eye_x_pos)
+            eye_y_positions.append(eye_y_pos)
 
-    cv2.imshow('img', image)
+            # Standards: in general in the interests of improving readability, move logical chunks
+            # of code out into their own classes, methods, or functions to make it easier to understand overall
+            # program flow
+            update_mouse_position(hough_circles, eye_x_pos, eye_y_pos, roi_color2)
 
-    # Standards: code like this can be hard to understand, so comments explicitly describing operation are desirable:
-    # This reduces cv2.waitKey() response to 8 bit integer, representing ASCII input
-    key_pressed = cv2.waitKey(30) & 0xff
-    if key_pressed == ESCAPE_KEY:
-        break
+        cv2.imshow('img', image)
 
-    plot_data(x, y)
+        # Standards: code like this can be hard to understand, so comments explicitly describing operation are desirable:
+        # This reduces cv2.waitKey() response to 8 bit integer, representing ASCII input
+        key_pressed = cv2.waitKey(30) & 0xff
 
-capture.release()
-cv2.destroyAllWindows()
-data = list(zip(eye_x_positions, eye_y_positions))
+    # close window
+    video_capture.release()
+    cv2.destroyAllWindows()
+
+    # plot heatmap
+    plot_data(eye_x_positions, eye_y_positions)
 
 def plot_data(x, y):
     h, x, y, p = plt.hist2d(x, y)               # generates 2d heatmap
@@ -122,8 +124,7 @@ def plot_data(x, y):
     plt.imshow(h, interpolation = "gaussian")   # draws heatmap
     plt.axis("off")
     plt.show()
+    sns.set()
 
-plt.scatter(eye_x_positions, eye_y_positions)
-plt.show()
-sns.set()
-# plt.imshow(data, cmap='hot', interpolation='nearest')
+if __name__ == "__main__":
+    run_tracker()

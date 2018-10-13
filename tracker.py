@@ -106,7 +106,7 @@ while 1:
         break
 
 
-capture.release()
+video_capture.release()
 cv2.destroyAllWindows()
 data = list(zip(eye_x_positions, eye_y_positions))
 

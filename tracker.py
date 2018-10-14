@@ -9,6 +9,15 @@ ESCAPE_KEY = 27
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 
+def transform_video_coordinates_to_screen(eye_x_pos, eye_y_pos):
+    if not video_resolution:
+        return (eye_x_pos, eye_y_pos)
+
+    return (
+        eye_x_pos / video_resolution[0] * screen_resolution[0],
+        eye_y_pos / video_resolution[1] * screen_resolution[1],
+    )
+
 
 def update_mouse_position(hough_circles, eye_x_pos, eye_y_pos, roi_color2):
     try:
@@ -37,6 +46,7 @@ def update_mouse_position(hough_circles, eye_x_pos, eye_y_pos, roi_color2):
 
             x_pos = int(eye_x_pos)
             y_pos = int(eye_y_pos)
+            (x_pos, y_pos) = transform_video_coordinates_to_screen(eye_x_pos, eye_y_pos)
             autopy.mouse.move(x_pos, y_pos)
     except Exception as e:
         # Standards: exception handling in try: except cases should generally be as specific as possible. What type of 
@@ -54,6 +64,15 @@ eye_cascade = cv2.CascadeClassifier(
 video_capture = cv2.VideoCapture(0)
 eye_x_positions = list()
 eye_y_positions = list()
+
+screen_resolution = autopy.screen.size()
+if video_capture.isOpened():
+    video_resolution = (
+        video_capture.get(cv2.CAP_PROP_FRAME_WIDTH),
+        video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT),
+    )
+else:
+    video_resolution = None
 
 while 1:
     success, image = video_capture.read()

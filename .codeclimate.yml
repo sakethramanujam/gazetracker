@@ -1,0 +1,19 @@
+version: "2"
+checks:
+  argument-count:
+    config:
+      threshold: 5
+plugins:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
+  fixme:
+    enabled: true
+  radon:
+    enabled: true
+  pep8:
+    enabled: true
+  sonar-python:
+    enabled: true
